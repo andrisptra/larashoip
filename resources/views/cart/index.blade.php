@@ -43,16 +43,16 @@
                     </div>
                 @endif
 
-                @if (session('cart') && count(session('cart')) > 0)
+                @if ($cartItems->count() > 0)
                     <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
                         <!-- Cart Items -->
                         <div class="lg:col-span-2 space-y-4">
-                            @foreach (session('cart') as $id => $details)
+                            @foreach ($cartItems as $item)
                                 <div class="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl p-6">
                                     <div class="flex items-center">
-                                        @if ($details['image'])
-                                            <img src="{{ Storage::url($details['image']) }}"
-                                                alt="{{ $details['name'] }}" class="h-24 w-24 rounded object-cover">
+                                        @if ($item->product->image)
+                                            <img src="{{ Storage::url($item->product->image) }}"
+                                                alt="{{ $item->product->name }}" class="h-24 w-24 rounded object-cover">
                                         @else
                                             <div class="h-24 w-24 rounded bg-gray-200 flex items-center justify-center">
                                                 <svg class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24"
@@ -64,27 +64,23 @@
                                             </div>
                                         @endif
                                         <div class="ml-6 flex-1">
-                                            <h3 class="text-lg font-medium text-gray-900">{{ $details['name'] }}</h3>
+                                            <h3 class="text-lg font-medium text-gray-900">{{ $item->product->name }}
+                                            </h3>
                                             <p class="mt-1 text-sm text-gray-500">Rp
-                                                {{ number_format($details['price'], 0, ',', '.') }} each</p>
-                                            @php
-                                                $product = \App\Models\Product::find($id);
-                                            @endphp
-                                            @if ($product)
-                                                <p
-                                                    class="mt-1 text-xs {{ $product->stock < 10 ? 'text-red-600' : 'text-gray-500' }}">
-                                                    Stock: {{ $product->stock }} available
-                                                </p>
-                                            @endif
+                                                {{ number_format($item->price, 0, ',', '.') }} each</p>
+                                            <p
+                                                class="mt-1 text-xs {{ $item->product->stock < 10 ? 'text-red-600' : 'text-gray-500' }}">
+                                                Stock: {{ $item->product->stock }} available
+                                            </p>
                                             <div class="mt-4 flex items-center gap-4">
                                                 <div class="flex items-center">
-                                                    <label for="quantity-{{ $id }}"
+                                                    <label for="quantity-{{ $item->id }}"
                                                         class="sr-only">Quantity</label>
-                                                    <input type="number" id="quantity-{{ $id }}"
-                                                        name="quantity" value="{{ $details['quantity'] }}"
-                                                        min="1" max="{{ $product ? $product->stock : 999 }}"
-                                                        data-price="{{ $details['price'] }}"
-                                                        data-item-id="{{ $id }}"
+                                                    <input type="number" id="quantity-{{ $item->id }}"
+                                                        name="quantity" value="{{ $item->quantity }}" min="1"
+                                                        max="{{ $item->product->stock }}"
+                                                        data-price="{{ $item->price }}"
+                                                        data-item-id="{{ $item->id }}"
                                                         class="quantity-input block w-20 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm sm:leading-6"
                                                         onchange="updateItemTotal(this)">
                                                     <form action="{{ route('cart.update') }}" method="POST"
@@ -92,10 +88,10 @@
                                                         @csrf
                                                         @method('PATCH')
                                                         <input type="hidden" name="product_id"
-                                                            value="{{ $id }}">
+                                                            value="{{ $item->product_id }}">
                                                         <input type="hidden" name="quantity"
-                                                            id="hidden-quantity-{{ $id }}"
-                                                            value="{{ $details['quantity'] }}">
+                                                            id="hidden-quantity-{{ $item->id }}"
+                                                            value="{{ $item->quantity }}">
                                                         <button type="submit"
                                                             class="text-sm font-medium text-green-600 hover:text-green-500">Update</button>
                                                     </form>
@@ -105,7 +101,7 @@
                                                     @csrf
                                                     @method('DELETE')
                                                     <input type="hidden" name="product_id"
-                                                        value="{{ $id }}">
+                                                        value="{{ $item->product_id }}">
                                                     <button type="submit"
                                                         class="text-sm font-medium text-red-600 hover:text-red-500">Remove</button>
                                                 </form>
@@ -113,8 +109,8 @@
                                         </div>
                                         <div class="ml-4 text-right">
                                             <p class="text-lg font-semibold text-gray-900"
-                                                id="item-total-{{ $id }}">Rp
-                                                {{ number_format($details['price'] * $details['quantity'], 0, ',', '.') }}
+                                                id="item-total-{{ $item->id }}">Rp
+                                                {{ number_format($item->price * $item->quantity, 0, ',', '.') }}
                                             </p>
                                         </div>
                                     </div>
@@ -128,10 +124,9 @@
                                 <h3 class="text-lg font-semibold leading-6 text-gray-900">Order Summary</h3>
                                 <dl class="mt-6 space-y-4">
                                     @php
-                                        $subtotal = 0;
-                                        foreach (session('cart') as $details) {
-                                            $subtotal += $details['price'] * $details['quantity'];
-                                        }
+                                        $subtotal = $cartItems->sum(function ($item) {
+                                            return $item->price * $item->quantity;
+                                        });
                                     @endphp
                                     <div class="flex items-center justify-between">
                                         <dt class="text-sm text-gray-600">Subtotal</dt>

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
+use App\Models\Cart;
+use App\Models\CartItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -13,36 +15,43 @@ class CartController extends Controller
 {
     public function addToCart(Request $request, Product $product)
     {
-        $cart = session()->get('cart', []);
         $quantity = $request->input('quantity', 1);
 
         if ($product->stock < $quantity) {
             return back()->with('error', 'Insufficient stock available.');
         }
 
-        if (isset($cart[$product->id])) {
-            $newQuantity = $cart[$product->id]['quantity'] + $quantity;
+        // Get or create cart for user
+        $cart = Cart::firstOrCreate(['user_id' => Auth::id()]);
+
+        // Check if product already in cart
+        $cartItem = CartItem::where('cart_id', $cart->id)
+            ->where('product_id', $product->id)
+            ->first();
+
+        if ($cartItem) {
+            $newQuantity = $cartItem->quantity + $quantity;
             if ($product->stock < $newQuantity) {
                 return back()->with('error', 'Insufficient stock available.');
             }
-            $cart[$product->id]['quantity'] = $newQuantity;
+            $cartItem->update(['quantity' => $newQuantity]);
         } else {
-            $cart[$product->id] = [
-                "name" => $product->name,
-                "quantity" => $quantity,
-                "price" => $product->price,
-                "image" => $product->image
-            ];
+            CartItem::create([
+                'cart_id' => $cart->id,
+                'product_id' => $product->id,
+                'quantity' => $quantity,
+                'price' => $product->price
+            ]);
         }
 
-        session()->put('cart', $cart);
         return back()->with('success', 'Product added to cart successfully!');
     }
 
     public function viewCart()
     {
-        $cart = session()->get('cart', []);
-        return view('cart.index', compact('cart'));
+        $cart = Cart::with('items.product')->where('user_id', Auth::id())->first();
+        $cartItems = $cart ? $cart->items : collect();
+        return view('cart.index', compact('cartItems'));
     }
 
     public function updateCart(Request $request)
@@ -52,7 +61,6 @@ class CartController extends Controller
             'quantity' => 'required|integer|min:1'
         ]);
 
-        $cart = session()->get('cart');
         $product = Product::find($request->product_id);
 
         if (!$product) {
@@ -63,8 +71,17 @@ class CartController extends Controller
             return back()->with('error', "Insufficient stock. Only {$product->stock} items available.");
         }
 
-        $cart[$request->product_id]["quantity"] = $request->quantity;
-        session()->put('cart', $cart);
+        $cart = Cart::where('user_id', Auth::id())->first();
+        if ($cart) {
+            $cartItem = CartItem::where('cart_id', $cart->id)
+                ->where('product_id', $request->product_id)
+                ->first();
+
+            if ($cartItem) {
+                $cartItem->update(['quantity' => $request->quantity]);
+            }
+        }
+
         return back()->with('success', 'Cart updated successfully');
     }
 
@@ -74,19 +91,21 @@ class CartController extends Controller
             'product_id' => 'required'
         ]);
 
-        $cart = session()->get('cart');
-        if (isset($cart[$request->product_id])) {
-            unset($cart[$request->product_id]);
-            session()->put('cart', $cart);
+        $cart = Cart::where('user_id', Auth::id())->first();
+        if ($cart) {
+            CartItem::where('cart_id', $cart->id)
+                ->where('product_id', $request->product_id)
+                ->delete();
         }
+
         return back()->with('success', 'Product removed successfully');
     }
 
     public function checkout(Request $request)
     {
-        $cart = session()->get('cart', []);
+        $cart = Cart::with('items.product')->where('user_id', Auth::id())->first();
 
-        if (empty($cart)) {
+        if (!$cart || $cart->items->isEmpty()) {
             return back()->with('error', 'Your cart is empty.');
         }
 
@@ -94,18 +113,18 @@ class CartController extends Controller
             DB::beginTransaction();
 
             $total = 0;
-            foreach ($cart as $id => $details) {
-                $product = Product::find($id);
+            foreach ($cart->items as $item) {
+                $product = $item->product;
 
                 if (!$product) {
-                    throw new \Exception("Product not found: $id");
+                    throw new \Exception("Product not found");
                 }
 
-                if ($product->stock < $details['quantity']) {
+                if ($product->stock < $item->quantity) {
                     throw new \Exception("Insufficient stock for {$product->name}. Only {$product->stock} available.");
                 }
 
-                $total += $details['price'] * $details['quantity'];
+                $total += $item->price * $item->quantity;
             }
 
             $transaction = Transaction::create([
@@ -115,24 +134,25 @@ class CartController extends Controller
                 'status' => 'completed'
             ]);
 
-            foreach ($cart as $id => $details) {
-                $product = Product::find($id);
+            foreach ($cart->items as $item) {
+                $product = $item->product;
 
                 TransactionDetail::create([
                     'transaction_id' => $transaction->id,
-                    'product_id' => $id,
-                    'quantity' => $details['quantity'],
-                    'base_price' => $details['price'],
+                    'product_id' => $item->product_id,
+                    'quantity' => $item->quantity,
+                    'base_price' => $item->price,
                     'base_cost' => $product->cost,
-                    'subtotal' => $details['price'] * $details['quantity']
+                    'subtotal' => $item->price * $item->quantity
                 ]);
 
-                $product->decrement('stock', $details['quantity']);
+                $product->decrement('stock', $item->quantity);
             }
 
             DB::commit();
 
-            session()->forget('cart');
+            // Clear cart after checkout
+            $cart->items()->delete();
 
             return redirect()->route('transactions.show', $transaction)
                 ->with('success', 'Order placed successfully!');

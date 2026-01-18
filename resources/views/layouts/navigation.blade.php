@@ -20,9 +20,13 @@
                     </x-nav-link>
                     <x-nav-link :href="route('cart.index')" :active="request()->routeIs('cart.*')">
                         {{ __('Cart') }}
-                        @if (session('cart') && count(session('cart')) > 0)
+                        @php
+                            $cart = Auth::user()->cart;
+                            $cartCount = $cart ? $cart->items->count() : 0;
+                        @endphp
+                        @if ($cartCount > 0)
                             <span
-                                class="ml-1 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold leading-none text-white bg-green-600 rounded-full">{{ count(session('cart')) }}</span>
+                                class="ml-1 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold leading-none text-white bg-green-600 rounded-full">{{ $cartCount }}</span>
                         @endif
                     </x-nav-link>
                     <x-nav-link :href="route('transactions.index')" :active="request()->routeIs('transactions.*')">
@@ -106,7 +110,17 @@
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('cart.index')" :active="request()->routeIs('cart.*')">
-                {{ __('Cart') }}
+                <span class="flex items-center">
+                    {{ __('Cart') }}
+                    @php
+                        $cart = Auth::user()->cart;
+                        $cartCount = $cart ? $cart->items->count() : 0;
+                    @endphp
+                    @if ($cartCount > 0)
+                        <span
+                            class="ml-2 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold leading-none text-white bg-green-600 rounded-full">{{ $cartCount }}</span>
+                    @endif
+                </span>
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('transactions.index')" :active="request()->routeIs('transactions.*')">
                 {{ __('My Orders') }}
