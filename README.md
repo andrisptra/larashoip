@@ -1,52 +1,213 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# LaraShop - E-Commerce Laravel Application
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+LaraShop adalah aplikasi e-commerce lengkap yang dibangun dengan Laravel 12, menampilkan panel admin yang komprehensif, manajemen produk, sistem keranjang belanja dengan persistensi database, dan pelacakan transaksi real-time.
 
-## About Laravel
+## ✨ Fitur Utama
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### Untuk Customer
+- 🛍️ **Katalog Produk** - Jelajahi produk dengan filter kategori, pencarian, dan pengurutan
+- 🛒 **Keranjang Belanja Persisten** - Keranjang tersimpan di database, tidak hilang setelah logout
+- 💳 **Checkout Aman** - Validasi stok real-time dan pemrosesan transaksi
+- 📦 **Riwayat Pesanan** - Lacak semua pesanan dan detail transaksi Anda
+- 📊 **Update Harga Real-time** - Kalkulasi harga otomatis saat mengubah quantity
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Untuk Admin
+- 📊 **Dashboard Statistik** - Ringkasan penjualan, produk, dan profit
+- 🏷️ **Manajemen Kategori** - CRUD lengkap untuk kategori produk
+- 📦 **Manajemen Produk** - Kelola produk dengan gambar, harga, cost, dan stok
+- 💰 **Laporan Transaksi** - Lihat semua transaksi dengan detail lengkap
+- 📈 **Analytics** - Top selling products dan sales overtime dengan kalkulasi profit
+- 👥 **Role-Based Access** - Pemisahan akses admin dan customer
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 🛠️ Teknologi yang Digunakan
 
-## Learning Laravel
+- **Framework**: Laravel 12.47.0
+- **PHP**: 8.4.7
+- **Frontend**: Tailwind CSS v3.4.19 + Alpine.js
+- **Build Tool**: Vite 7.3.1
+- **Database**: MySQL
+- **Authentication**: Laravel Breeze
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## 📋 Persyaratan Sistem
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Pastikan sistem Anda memiliki:
+- PHP >= 8.2
+- Composer
+- Node.js & NPM
+- MySQL
+- Git
 
-## Laravel Sponsors
+## 🚀 Cara Menjalankan Projek di Lokal
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 1. Clone Repository
 
-### Premium Partners
+```bash
+git clone <repository-url>
+cd larashop
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 2. Install Dependencies
 
-## Contributing
+```bash
+# Install PHP dependencies
+composer install
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# Install JavaScript dependencies
+npm install
+```
 
-## Code of Conduct
+### 3. Konfigurasi Environment
+
+```bash
+# Copy file .env.example menjadi .env
+cp .env.example .env
+
+# Generate application key
+php artisan key:generate
+```
+
+### 4. Konfigurasi Database
+
+Buka file `.env` dan sesuaikan konfigurasi database:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=larashop
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+Buat database baru di MySQL:
+
+```sql
+CREATE DATABASE larashop;
+```
+
+### 5. Jalankan Migration dan Seeder
+
+```bash
+# Jalankan migration dan seeder sekaligus
+php artisan migrate:fresh --seed
+```
+
+Seeder akan membuat:
+- **User Admin**: email: `admin@example.com`, password: `password`
+- **User Customer**: email: `user@example.com`, password: `password`
+- **6 Kategori**: Electronics, Fashion, Home & Living, Books, Sports, Food & Beverage
+- **23 Produk** dengan data realistis (nama, harga, stok, gambar)
+
+### 6. Buat Symbolic Link untuk Storage
+
+```bash
+php artisan storage:link
+```
+
+### 7. Jalankan Development Server
+
+Buka **2 terminal** dan jalankan:
+
+**Terminal 1 - Laravel Server:**
+```bash
+php artisan serve
+```
+
+**Terminal 2 - Vite Dev Server (untuk Tailwind CSS):**
+```bash
+npm run dev
+```
+
+### 8. Akses Aplikasi
+
+Buka browser dan akses:
+- **Website**: http://localhost:8000
+
+## 🔐 Login Credentials
+
+### Admin
+- Email: `admin@example.com`
+- Password: `password`
+- Akses: Dashboard Admin dengan full analytics dan manajemen
+
+### Customer
+- Email: `user@example.com`
+- Password: `password`
+- Akses: Shopping, cart, dan order tracking
+
+## 📁 Struktur Projek
+
+```
+larashop/
+├── app/
+│   ├── Http/Controllers/
+│   │   ├── Admin/           # Admin controllers
+│   │   └── CartController.php
+│   └── Models/              # Eloquent models
+├── database/
+│   ├── migrations/          # Database schema
+│   └── seeders/            # Data seeders
+├── resources/
+│   ├── views/
+│   │   ├── admin/          # Admin panel views
+│   │   ├── cart/           # Cart views
+│   │   ├── products/       # Product catalog
+│   │   └── transactions/   # Order history
+│   ├── css/
+│   └── js/
+├── routes/
+│   └── web.php            # Application routes
+└── public/
+    └── storage/           # Public storage (images)
+```
+
+## 🎯 Fitur Database
+
+### Tables
+- **users** - User authentication dengan role (admin/user)
+- **categories** - Kategori produk
+- **products** - Produk dengan harga, cost, stok, dan gambar
+- **carts** - Keranjang belanja per user
+- **cart_items** - Item dalam keranjang (persisten)
+- **transactions** - Header transaksi
+- **transaction_details** - Detail item per transaksi
+
+### Relasi
+- User hasOne Cart
+- Cart hasMany CartItems
+- Product hasMany CartItems
+- Transaction hasMany TransactionDetails
+
+## 🔧 Troubleshooting
+
+### Tailwind CSS tidak muncul
+```bash
+npm run dev
+```
+Pastikan Vite dev server berjalan di terminal terpisah.
+
+### Error "Route [welcome] not defined"
+Sudah diperbaiki - route welcome di-redirect ke products.index.
+
+### Keranjang hilang setelah logout
+Sudah diperbaiki dengan database-backed cart. Keranjang sekarang persisten.
+
+### Error migration
+```bash
+php artisan migrate:fresh --seed
+```
+Reset database dan jalankan ulang migration.
+
+## 📝 Catatan Pengembangan
+
+- **Real-time Cart Updates**: Menggunakan JavaScript untuk update harga tanpa reload
+- **Profit Tracking**: Admin dapat melihat profit per produk dan per periode
+- **Stock Validation**: Validasi stok real-time saat checkout
+- **Persistent Cart**: Cart tersimpan di database, tidak di session
+
+## 📄 License
+
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
 In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
 
