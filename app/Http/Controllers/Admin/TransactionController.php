@@ -51,30 +51,60 @@ class TransactionController extends Controller
             ->join('products', 'transaction_details.product_id', '=', 'products.id')
             ->join('transactions', 'transaction_details.transaction_id', '=', 'transactions.id')
             ->whereBetween('transactions.created_at', [$startDate, $endDate . ' 23:59:59'])
-            ->select('products.name', DB::raw('SUM(transaction_details.quantity) as total_sold'))
-            ->groupBy('products.id', 'products.name')
+            ->select(
+                'products.id',
+                'products.name',
+                'products.image',
+                'products.price',
+                'products.cost',
+                DB::raw('SUM(transaction_details.quantity) as total_sold'),
+                DB::raw('SUM(transaction_details.subtotal) as revenue'),
+                DB::raw('SUM((transaction_details.base_price - products.cost) * transaction_details.quantity) as profit')
+            )
+            ->groupBy('products.id', 'products.name', 'products.image', 'products.price', 'products.cost')
             ->orderByDesc('total_sold')
             ->limit(10)
             ->get();
 
         // Penjualan per periode
         if ($period === 'daily') {
-            $salesData = Transaction::selectRaw('DATE(created_at) as date, COUNT(*) as count, SUM(total_amount) as revenue')
-                ->whereBetween('created_at', [$startDate, $endDate . ' 23:59:59'])
-                ->groupBy('date')
-                ->orderBy('date')
+            $salesData = DB::table('transactions')
+                ->join('transaction_details', 'transactions.id', '=', 'transaction_details.transaction_id')
+                ->join('products', 'transaction_details.product_id', '=', 'products.id')
+                ->whereBetween('transactions.created_at', [$startDate, $endDate . ' 23:59:59'])
+                ->selectRaw('DATE(transactions.created_at) as period')
+                ->selectRaw('COUNT(DISTINCT transactions.id) as orders')
+                ->selectRaw('SUM(transaction_details.quantity) as items_sold')
+                ->selectRaw('SUM(transactions.total_amount) as revenue')
+                ->selectRaw('SUM((transaction_details.base_price - products.cost) * transaction_details.quantity) as profit')
+                ->groupBy('period')
+                ->orderBy('period')
                 ->get();
         } elseif ($period === 'monthly') {
-            $salesData = Transaction::selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, COUNT(*) as count, SUM(total_amount) as revenue')
-                ->whereBetween('created_at', [$startDate, $endDate . ' 23:59:59'])
-                ->groupBy('month')
-                ->orderBy('month')
+            $salesData = DB::table('transactions')
+                ->join('transaction_details', 'transactions.id', '=', 'transaction_details.transaction_id')
+                ->join('products', 'transaction_details.product_id', '=', 'products.id')
+                ->whereBetween('transactions.created_at', [$startDate, $endDate . ' 23:59:59'])
+                ->selectRaw('DATE_FORMAT(transactions.created_at, "%Y-%m") as period')
+                ->selectRaw('COUNT(DISTINCT transactions.id) as orders')
+                ->selectRaw('SUM(transaction_details.quantity) as items_sold')
+                ->selectRaw('SUM(transactions.total_amount) as revenue')
+                ->selectRaw('SUM((transaction_details.base_price - products.cost) * transaction_details.quantity) as profit')
+                ->groupBy('period')
+                ->orderBy('period')
                 ->get();
         } else {
-            $salesData = Transaction::selectRaw('YEAR(created_at) as year, COUNT(*) as count, SUM(total_amount) as revenue')
-                ->whereBetween('created_at', [$startDate, $endDate . ' 23:59:59'])
-                ->groupBy('year')
-                ->orderBy('year')
+            $salesData = DB::table('transactions')
+                ->join('transaction_details', 'transactions.id', '=', 'transaction_details.transaction_id')
+                ->join('products', 'transaction_details.product_id', '=', 'products.id')
+                ->whereBetween('transactions.created_at', [$startDate, $endDate . ' 23:59:59'])
+                ->selectRaw('YEAR(transactions.created_at) as period')
+                ->selectRaw('COUNT(DISTINCT transactions.id) as orders')
+                ->selectRaw('SUM(transaction_details.quantity) as items_sold')
+                ->selectRaw('SUM(transactions.total_amount) as revenue')
+                ->selectRaw('SUM((transaction_details.base_price - products.cost) * transaction_details.quantity) as profit')
+                ->groupBy('period')
+                ->orderBy('period')
                 ->get();
         }
 

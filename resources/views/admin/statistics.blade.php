@@ -122,16 +122,16 @@
                         @forelse($salesData as $sale)
                             <tr>
                                 <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
-                                    {{ $sale->date ?? $sale->month ?? $sale->year }}
+                                    {{ $sale->period }}
                                 </td>
                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                    {{ number_format($sale->count) }}</td>
+                                    {{ number_format($sale->orders) }}</td>
                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                    -</td>
+                                    {{ number_format($sale->items_sold) }}</td>
                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-900">Rp
                                     {{ number_format($sale->revenue, 0, ',', '.') }}</td>
                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-green-600 font-medium">Rp
-                                    -</td>
+                                    {{ number_format($sale->profit ?? 0, 0, ',', '.') }}</td>
                             </tr>
                         @empty
                             <tr>
@@ -181,11 +181,11 @@
                                     </div>
                                 </td>
                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                    {{ number_format($product->total_quantity) }}</td>
+                                    {{ number_format($product->total_sold) }}</td>
                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-900">Rp
-                                    {{ number_format($product->total_revenue, 0, ',', '.') }}</td>
+                                    {{ number_format($product->revenue, 0, ',', '.') }}</td>
                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-green-600 font-medium">Rp
-                                    {{ number_format($product->total_profit, 0, ',', '.') }}</td>
+                                    {{ number_format($product->profit ?? 0, 0, ',', '.') }}</td>
                             </tr>
                         @empty
                             <tr>

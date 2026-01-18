@@ -49,7 +49,7 @@
                                                 <p class="text-sm font-medium text-gray-900">
                                                     {{ $detail->product->name }}</p>
                                                 <p class="text-sm text-gray-500">{{ $detail->quantity }} x Rp
-                                                    {{ number_format($detail->price, 0, ',', '.') }}</p>
+                                                    {{ number_format($detail->base_price, 0, ',', '.') }}</p>
                                             </div>
                                         </div>
                                     @endforeach

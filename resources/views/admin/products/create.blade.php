@@ -11,7 +11,8 @@
 
                     <div class="space-y-6">
                         <div>
-                            <label for="name" class="block text-sm font-semibold text-gray-900 mb-2">Product Name <span class="text-red-500">*</span></label>
+                            <label for="name" class="block text-sm font-semibold text-gray-900 mb-2">Product Name
+                                <span class="text-red-500">*</span></label>
                             <input type="text" name="name" id="name" value="{{ old('name') }}"
                                 class="mt-1 block w-full rounded-md shadow-sm focus:border-green-500 focus:ring-green-500 px-4 py-3 text-base bg-gray-50 {{ $errors->has('name') ? 'border-red-300' : 'border-gray-300' }}"
                                 required>
@@ -21,12 +22,14 @@
                         </div>
 
                         <div>
-                            <label for="category_id" class="block text-sm font-semibold text-gray-900 mb-2">Category</label>
+                            <label for="category_id"
+                                class="block text-sm font-semibold text-gray-900 mb-2">Category</label>
                             <select name="category_id" id="category_id"
                                 class="mt-1 block w-full rounded-md shadow-sm focus:border-green-500 focus:ring-green-500 px-4 py-3 text-base bg-gray-50 {{ $errors->has('category_id') ? 'border-red-300' : 'border-gray-300' }}">
                                 <option value="">-- Select Category --</option>
                                 @foreach ($categories as $category)
-                                    <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                    <option value="{{ $category->id }}"
+                                        {{ old('category_id') == $category->id ? 'selected' : '' }}>
                                         {{ $category->name }}
                                     </option>
                                 @endforeach
@@ -38,7 +41,8 @@
 
                         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                             <div>
-                                <label for="price" class="block text-sm font-semibold text-gray-900 mb-2">Selling Price (Rp) <span class="text-red-500">*</span></label>
+                                <label for="price" class="block text-sm font-semibold text-gray-900 mb-2">Selling
+                                    Price (Rp) <span class="text-red-500">*</span></label>
                                 <input type="number" name="price" id="price" value="{{ old('price') }}"
                                     class="mt-1 block w-full rounded-md shadow-sm focus:border-green-500 focus:ring-green-500 px-4 py-3 text-base bg-gray-50 {{ $errors->has('price') ? 'border-red-300' : 'border-gray-300' }}"
                                     required>
@@ -48,7 +52,8 @@
                             </div>
 
                             <div>
-                                <label for="cost" class="block text-sm font-semibold text-gray-900 mb-2">Cost Price (Rp) <span class="text-red-500">*</span></label>
+                                <label for="cost" class="block text-sm font-semibold text-gray-900 mb-2">Cost Price
+                                    (Rp) <span class="text-red-500">*</span></label>
                                 <input type="number" name="cost" id="cost" value="{{ old('cost') }}"
                                     class="mt-1 block w-full rounded-md shadow-sm focus:border-green-500 focus:ring-green-500 px-4 py-3 text-base bg-gray-50 {{ $errors->has('cost') ? 'border-red-300' : 'border-gray-300' }}"
                                     required>
@@ -59,7 +64,8 @@
                         </div>
 
                         <div>
-                            <label for="stock" class="block text-sm font-semibold text-gray-900 mb-2">Initial Stock <span class="text-red-500">*</span></label>
+                            <label for="stock" class="block text-sm font-semibold text-gray-900 mb-2">Initial Stock
+                                <span class="text-red-500">*</span></label>
                             <input type="number" name="stock" id="stock" value="{{ old('stock') }}"
                                 class="mt-1 block w-full rounded-md shadow-sm focus:border-green-500 focus:ring-green-500 px-4 py-3 text-base bg-gray-50 {{ $errors->has('stock') ? 'border-red-300' : 'border-gray-300' }}"
                                 required>
@@ -69,7 +75,8 @@
                         </div>
 
                         <div>
-                            <label for="description" class="block text-sm font-semibold text-gray-900 mb-2">Description</label>
+                            <label for="description"
+                                class="block text-sm font-semibold text-gray-900 mb-2">Description</label>
                             <textarea name="description" id="description" rows="4"
                                 class="mt-1 block w-full rounded-md shadow-sm focus:border-green-500 focus:ring-green-500 px-4 py-3 text-base bg-gray-50 {{ $errors->has('description') ? 'border-red-300' : 'border-gray-300' }}">{{ old('description') }}</textarea>
                             @error('description')
@@ -78,7 +85,8 @@
                         </div>
 
                         <div>
-                            <label for="image" class="block text-sm font-semibold text-gray-900 mb-2">Product Image</label>
+                            <label for="image" class="block text-sm font-semibold text-gray-900 mb-2">Product
+                                Image</label>
                             <input type="file" name="image" id="image" accept="image/*"
                                 class="mt-1 block w-full text-base text-gray-500 file:mr-4 file:py-3 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 border border-gray-300 rounded-md px-3 py-2 bg-gray-50">
                             @error('image')

@@ -34,10 +34,10 @@ class DatabaseSeeder extends Seeder
             'role' => 'user',
         ]);
 
-
-        // seeder for categories
-        Category::create(['name' => 'Electronics']);
-        Category::create(['name' => 'Books']);
-        Category::create(['name' => 'Clothing']);
+        // Seed categories and products
+        $this->call([
+            CategorySeeder::class,
+            ProductSeeder::class,
+        ]);
     }
 }

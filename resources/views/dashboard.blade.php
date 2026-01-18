@@ -175,12 +175,14 @@
                                             <p class="text-lg font-semibold text-green-600">Rp
                                                 {{ number_format($product->price, 0, ',', '.') }}</p>
                                             @if ($product->stock > 0)
-                                                <form action="{{ route('cart.add', $product) }}" method="POST">
+                                                <form action="{{ route('cart.add', $product) }}" method="POST"
+                                                    class="flex items-center gap-2">
                                                     @csrf
-                                                    <input type="hidden" name="quantity" value="1">
+                                                    <input type="number" name="quantity" value="1"
+                                                        min="1" max="{{ $product->stock }}"
+                                                        class="w-16 rounded-md border-gray-300 text-sm py-1 px-2 focus:border-green-500 focus:ring-green-500">
                                                     <button type="submit"
-                                                        class="rounded-md bg-green-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-green-500">Add
-                                                        to cart</button>
+                                                        class="rounded-md bg-green-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-green-500">Add</button>
                                                 </form>
                                             @else
                                                 <span class="text-xs text-red-600 font-medium">Out of stock</span>

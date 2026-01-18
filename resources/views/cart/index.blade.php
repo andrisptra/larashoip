@@ -70,38 +70,50 @@
                                             @php
                                                 $product = \App\Models\Product::find($id);
                                             @endphp
-                                            @if($product)
-                                                <p class="mt-1 text-xs {{ $product->stock < 10 ? 'text-red-600' : 'text-gray-500' }}">
+                                            @if ($product)
+                                                <p
+                                                    class="mt-1 text-xs {{ $product->stock < 10 ? 'text-red-600' : 'text-gray-500' }}">
                                                     Stock: {{ $product->stock }} available
                                                 </p>
                                             @endif
                                             <div class="mt-4 flex items-center gap-4">
-                                                <form action="{{ route('cart.update') }}" method="POST"
-                                                    class="flex items-center">
-                                                    @csrf
-                                                    @method('PATCH')
-                                                    <input type="hidden" name="product_id" value="{{ $id }}">
+                                                <div class="flex items-center">
                                                     <label for="quantity-{{ $id }}"
                                                         class="sr-only">Quantity</label>
                                                     <input type="number" id="quantity-{{ $id }}"
                                                         name="quantity" value="{{ $details['quantity'] }}"
                                                         min="1" max="{{ $product ? $product->stock : 999 }}"
-                                                        class="block w-20 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm sm:leading-6">
-                                                    <button type="submit"
-                                                        class="ml-2 text-sm font-medium text-green-600 hover:text-green-500">Update</button>
-                                                </form>
+                                                        data-price="{{ $details['price'] }}"
+                                                        data-item-id="{{ $id }}"
+                                                        class="quantity-input block w-20 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm sm:leading-6"
+                                                        onchange="updateItemTotal(this)">
+                                                    <form action="{{ route('cart.update') }}" method="POST"
+                                                        class="inline ml-2">
+                                                        @csrf
+                                                        @method('PATCH')
+                                                        <input type="hidden" name="product_id"
+                                                            value="{{ $id }}">
+                                                        <input type="hidden" name="quantity"
+                                                            id="hidden-quantity-{{ $id }}"
+                                                            value="{{ $details['quantity'] }}">
+                                                        <button type="submit"
+                                                            class="text-sm font-medium text-green-600 hover:text-green-500">Update</button>
+                                                    </form>
+                                                </div>
                                                 <form action="{{ route('cart.remove') }}" method="POST"
                                                     onsubmit="return confirm('Remove this item from cart?');">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <input type="hidden" name="product_id" value="{{ $id }}">
+                                                    <input type="hidden" name="product_id"
+                                                        value="{{ $id }}">
                                                     <button type="submit"
                                                         class="text-sm font-medium text-red-600 hover:text-red-500">Remove</button>
                                                 </form>
                                             </div>
                                         </div>
                                         <div class="ml-4 text-right">
-                                            <p class="text-lg font-semibold text-gray-900">Rp
+                                            <p class="text-lg font-semibold text-gray-900"
+                                                id="item-total-{{ $id }}">Rp
                                                 {{ number_format($details['price'] * $details['quantity'], 0, ',', '.') }}
                                             </p>
                                         </div>
@@ -123,12 +135,12 @@
                                     @endphp
                                     <div class="flex items-center justify-between">
                                         <dt class="text-sm text-gray-600">Subtotal</dt>
-                                        <dd class="text-sm font-medium text-gray-900">Rp
+                                        <dd class="text-sm font-medium text-gray-900" id="cart-subtotal">Rp
                                             {{ number_format($subtotal, 0, ',', '.') }}</dd>
                                     </div>
                                     <div class="flex items-center justify-between border-t border-gray-200 pt-4">
                                         <dt class="text-base font-semibold text-gray-900">Total</dt>
-                                        <dd class="text-base font-semibold text-gray-900">Rp
+                                        <dd class="text-base font-semibold text-gray-900" id="cart-total">Rp
                                             {{ number_format($subtotal, 0, ',', '.') }}</dd>
                                     </div>
                                 </dl>
@@ -164,4 +176,41 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function updateItemTotal(input) {
+            const itemId = input.dataset.itemId;
+            const price = parseFloat(input.dataset.price);
+            const quantity = parseInt(input.value);
+            const total = price * quantity;
+
+            // Update item total display
+            const itemTotalElement = document.getElementById('item-total-' + itemId);
+            itemTotalElement.textContent = 'Rp ' + total.toLocaleString('id-ID');
+
+            // Update hidden input for form submission
+            const hiddenInput = document.getElementById('hidden-quantity-' + itemId);
+            hiddenInput.value = quantity;
+
+            // Update cart summary
+            updateCartSummary();
+        }
+
+        function updateCartSummary() {
+            let subtotal = 0;
+            document.querySelectorAll('.quantity-input').forEach(input => {
+                const price = parseFloat(input.dataset.price);
+                const quantity = parseInt(input.value);
+                subtotal += price * quantity;
+            });
+
+            // Update subtotal and total
+            const subtotalElement = document.getElementById('cart-subtotal');
+            const totalElement = document.getElementById('cart-total');
+            if (subtotalElement && totalElement) {
+                subtotalElement.textContent = 'Rp ' + subtotal.toLocaleString('id-ID');
+                totalElement.textContent = 'Rp ' + subtotal.toLocaleString('id-ID');
+            }
+        }
+    </script>
 </x-app-layout>

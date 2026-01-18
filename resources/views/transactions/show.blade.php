@@ -70,7 +70,7 @@
                                     <div class="mt-2 flex items-center justify-between">
                                         <p class="text-sm text-gray-500">Quantity: {{ $detail->quantity }}</p>
                                         <p class="text-sm font-medium text-gray-900">Rp
-                                            {{ number_format($detail->price, 0, ',', '.') }} each</p>
+                                            {{ number_format($detail->base_price, 0, ',', '.') }} each</p>
                                     </div>
                                 </div>
                                 <div class="ml-4 text-right">

@@ -100,7 +100,7 @@
                                                 </div>
                                             </td>
                                             <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Rp
-                                                {{ number_format($detail->price, 0, ',', '.') }}</td>
+                                                {{ number_format($detail->base_price, 0, ',', '.') }}</td>
                                             <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                                                 {{ $detail->quantity }}</td>
                                             <td
